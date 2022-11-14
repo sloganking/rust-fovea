@@ -5,10 +5,10 @@ use image::{
     DynamicImage, GenericImage, GenericImageView,
 };
 
-fn resize_image(img: &DynamicImage, factor: u32) -> DynamicImage {
+fn resize_image(img: &DynamicImage, factor: f32) -> DynamicImage {
     img.resize(
-        img.dimensions().0 / factor,
-        img.dimensions().1 / factor,
+        (img.dimensions().0 as f32 / factor) as u32,
+        (img.dimensions().1 as f32 / factor) as u32,
         FilterType::Lanczos3,
     )
 }
@@ -95,8 +95,9 @@ fn main() {
 
     images.push(image::open("input.png").unwrap());
 
-    let divisions: u32 = 4;
-    let factor: u32 = 2;
+    let (source_width, source_height) = images[0].dimensions();
+    let divisions: u32 = 5;
+    let factor: f32 = 2.;
 
     // resize images
     for x in 0..divisions - 1 {
@@ -127,7 +128,7 @@ fn main() {
         image.save(format!("./output/{}.png", x)).unwrap();
     }
 
-    let reconstruction = reconstruct_image(&images, (512, 512), divisions);
+    let reconstruction = reconstruct_image(&images, (source_width, source_height), divisions);
 
     reconstruction
         .save(Path::new("./output/reconstruction.png"))
